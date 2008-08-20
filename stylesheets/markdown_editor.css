@@ -26,7 +26,7 @@
 	height:16px;
 	float:left;
 	display:block;
-	background-image:url("/images/markdown_editor/toolbar.gif");
+	background-image:url("/images/markdown_editor/toolbar.png");
 	border:1px solid #fff;
 	border-right-color:#d7d7d7;
 }
@@ -52,6 +52,15 @@
 	border-right-color:#900;
 }
 
+.markdown_hr_button { background-position: 0 -17px;}
+.markdown_footnote_button { background-position: 0 -289px;}
+.markdown_toc_button { background-position: 0 -306px;}
+.markdown_def_button { background-position: 0 -255px;}
+.markdown_abbrev_button { background-position: 0 -272px;}
+.markdown_h1_button { background-position: 0 -187px;}
+.markdown_h2_button { background-position: 0 -204px;}
+.markdown_h3_button { background-position: 0 -221px;}
+.markdown_table_button {background-position: 0 -238px;}
 .markdown_italics_button { background-position: 0 -119px; }
 .markdown_bold_button { background-position: 0 -102px; }
 .markdown_link_button { background-position: 0 0; }
@@ -59,6 +68,6 @@
 .markdown_unordered_list_button { background-position: 0 -34px; }
 .markdown_ordered_list_button { background-position: 0 -51px; }
 .markdown_quote_button { background-position: 0 -68px; }
-.markdown_code_button { background-position: 0 -136px; }
+.markdown_code_button { background-position: 0 -85px; }
+.markdown_code_block_button { background-position: 0 -136px;}
 .markdown_help_button { background-position: 0 -153px; }
-.markdown_heading_button { background-position: 0 -85px; }

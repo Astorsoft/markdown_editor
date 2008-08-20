@@ -119,6 +119,90 @@ toolbar.addButton('Code',function(){this.smartWrap('`', '`')},{
 	className: 'markdown_code_button'
 });
 
+
+toolbar.addButton('H1',function(){
+	var selection = (this.getSelection() == '' ? prompt('Heading text', '') : this.getSelection());
+	if(selection == null)
+ 		return;
+
+	selection = (selection == '' ? 'Heading' : selection);
+	
+	this.replaceSelection(selection + "\n" + $R(0,Math.max(5,selection.length)).collect(function(){}).join('=') + "\n\n");
+},{
+	className: 'markdown_h1_button'
+});
+
+
+toolbar.addButton('H2',function(){
+	var selection = (this.getSelection() == '' ? prompt('Heading text', '') : this.getSelection());
+ if(selection == null)
+ 	return;
+
+	selection = (selection == '' ? 'Sub heading' : selection);
+	this.replaceSelection(selection + "\n" + $R(0,Math.max(5,selection.length)).collect(function(){}).join('-') + "\n\n");
+},{
+	className: 'markdown_h2_button'
+});
+
+toolbar.addButton('H3',function(){
+	var selection = (this.getSelection() == '' ? prompt('Heading text', '') : this.getSelection());
+ if(selection == null)
+ 	return;
+
+	selection = (selection == '' ? 'Sub sub heading' : selection);
+	this.replaceSelection('### '+ selection + '\n');
+},{
+	className: 'markdown_h3_button'
+});
+
+toolbar.addButton('HR', function(){
+	this.insertAfterSelection('\n\n---\n\n');
+},{
+	className: 'markdown_hr_button'
+});
+
+
+toolbar.addButton('table', function(){
+	var cols = parseInt(prompt('Number of columns',''));
+	if(isNaN(cols) || cols < 1)
+		return;
+	else{
+		var rows = parseInt(prompt('Number of rows',''));
+		if(isNaN(rows) || rows < 1)
+			return;
+		else{
+			caretInfo = this.getCaretInfo($(textarea_id));
+			var buff = '|';
+			
+			for(var i=1; i <= cols; i++){
+				buff += '  |';
+			}
+			
+			buff += '\n|';
+			
+			for(var i=1; i <= cols; i++){
+				buff +='--|';
+			}
+			buff += '\n';
+			
+			for(var j= 1; j <= rows; j++){
+				buff += '|';
+				for(var i=1; i <= cols; i++){
+					buff += '  |';
+				}
+				buff += '\n'
+			}
+		}
+		this.insertAfterSelection(buff);
+		caretInfo = {start:caretInfo.start+2, 
+								 end:caretInfo.end+2, 
+								 caret:caretInfo.caret+2};
+		this.setCaretInfo($(textarea_id), caretInfo);
+	}
+},{
+	className: 'markdown_table_button'
+});
+
 toolbar.addButton('Link',function(){
 	var selection = this.getSelection();
 	selection = (selection == '' ? prompt('Link Text', '') : selection);
@@ -171,24 +255,6 @@ toolbar.addButton('Link',function(){
 	className: 'markdown_link_button'
 });
 
-toolbar.addButton('Footnote',function(){
-	var selection = (this.getSelection() == '' ? prompt('Footnote for ?', '') : this.getSelection());
-	if(selection == null || selection == '')
-		return;
-		
-	var response = prompt('Enter the corresponding footnote','');
-	if(response == null || response == '')
-		return;
-		
-	nb_footnotes += 1;
-	this.replaceSelection(selection + '[^'+ nb_footnotes +']');
-	caretInfo = this.getCaretInfo($(textarea_id));
-	$(textarea_id).value += '\n[^' + nb_footnotes + ']: '+ response;
-	this.setCaretInfo($(textarea_id), caretInfo);
-	
-},{
-id: 'markdown_footnote_button'
-});
 
 toolbar.addButton('Image',function(){
 	var selection = this.getSelection();
@@ -226,65 +292,64 @@ toolbar.addButton('Image',function(){
 });
 
 
-toolbar.addButton('H1',function(){
-	var selection = (this.getSelection() == '' ? prompt('Heading text', '') : this.getSelection());
-	if(selection == null)
- 		return;
 
-	selection = (selection == '' ? 'Heading' : selection);
+toolbar.addButton('Unordered List',function(event){
+	this.collectFromEachSelectedLine(function(line){
+		return event.shiftKey ? (line.match(/^\-{2,}/) ? line.replace(/^\-/,'') : line.replace(/^\-\s/,'')) : (line.match(/\-+\s/) ? '*' : '- ') + line;
+	});
+},{
+	className: 'markdown_unordered_list_button'
+});
+
+toolbar.addButton('Ordered List',function(event){
+	var i = 0;
+	this.collectFromEachSelectedLine(function(line){
+		if(!line.match(/^\s+$/)){
+			++i;
+			return event.shiftKey ? line.replace(/^\d+\.\s/,'') : (line.match(/\d+\.\s/) ? '' : i + '. ') + line;
+		}
+	});
+},{
+	className: 'markdown_ordered_list_button'
+});
+
+toolbar.addButton('Block Quote',function(event){
+	this.collectFromEachSelectedLine(function(line){
+		return event.shiftKey ? line.replace(/^\> /,'') : '> ' + line;
+	});
+},{
+	className: 'markdown_quote_button'
+});
+
+toolbar.addButton('Code Block',function(event){
+	this.collectFromEachSelectedLine(function(line){
+		return event.shiftKey ? line.replace(/    /,'') : '    ' + line;
+	});
+},{
+	className: 'markdown_code_block_button'
+});
+
+
+toolbar.addButton('Footnote',function(){
+	var selection = (this.getSelection() == '' ? prompt('Footnote for ?', '') : this.getSelection());
+	if(selection == null || selection == '')
+		return;
+		
+	var response = prompt('Enter the corresponding footnote','');
+	if(response == null || response == '')
+		return;
+		
+	nb_footnotes += 1;
+	this.replaceSelection(selection + '[^'+ nb_footnotes +']');
+	caretInfo = this.getCaretInfo($(textarea_id));
+	$(textarea_id).value += '\n[^' + nb_footnotes + ']: '+ response;
+	this.setCaretInfo($(textarea_id), caretInfo);
 	
-	this.replaceSelection("\n" + selection + "\n" + $R(0,Math.max(5,selection.length)).collect(function(){}).join('=') + "\n\n");
 },{
-	className: 'markdown_h1_button'
+	className: 'markdown_footnote_button'
 });
 
 
-toolbar.addButton('H2',function(){
-	var selection = (this.getSelection() == '' ? prompt('Heading text', '') : this.getSelection());
- if(selection == null)
- 	return;
-
-	selection = (selection == '' ? 'Sub heading' : selection);
-	this.replaceSelection("\n" + selection + "\n" + $R(0,Math.max(5,selection.length)).collect(function(){}).join('-') + "\n\n");
-},{
-	className: 'markdown_h2_button'
-});
-
-toolbar.addButton('H3',function(){
-	var selection = (this.getSelection() == '' ? prompt('Heading text', '') : this.getSelection());
- if(selection == null)
- 	return;
-
-	selection = (selection == '' ? 'Sub sub heading' : selection);
-	this.replaceSelection('\n### '+ selection + '\n');
-},{
-	className: 'markdown_h3_button'
-});
-
-toolbar.addButton('HR', function(){
-	this.insertAfterSelection('\n\n---\n\n');
-},{
-	className: 'markdown_hr_button'
-});
-
-toolbar.addButton('TOC', function(){
-	
-	
-	this.insertAfterSelection('\n* toc\n{:toc}\n');
-	
-	if(confirm("Press ok to use automatically numbered headers.")) {
-		caretInfo = this.getCaretInfo($(textarea_id));
-		$(textarea_id).value = 'Use numbered headers: true\n\n' + $(textarea_id).value
-		// some hacks to put the carret just after the TOC adding.
-		var caretLeap = 'Use numbered headers: true\n\n'.length;
-		caretInfo = {start:caretInfo.start+caretLeap, 
-								 end:caretInfo.end+caretLeap, 
-								 caret:caretInfo.caret + caretLeap};
-		this.setCaretInfo($(textarea_id), caretInfo);
-	}
-},{
-	className: 'markdown_toc_button'
-});
 
 toolbar.addButton('def', function(){
 	var selection = (this.getSelection() == '' ? prompt('Term to define', '') : this.getSelection());
@@ -334,82 +399,24 @@ toolbar.addButton('abbrev', function(){
 	className: 'markdown_abbrev_button'
 });
 
-toolbar.addButton('table', function(){
-	var cols = parseInt(prompt('Number of columns',''));
-	if(isNaN(cols) || cols < 1)
-		return;
-	else{
-		var rows = parseInt(prompt('Number of rows',''));
-		if(isNaN(rows) || rows < 1)
-			return;
-		else{
-			caretInfo = this.getCaretInfo($(textarea_id));
-			var buff = '|';
-			
-			for(var i=1; i <= cols; i++){
-				buff += '  |';
-			}
-			
-			buff += '\n|';
-			
-			for(var i=1; i <= cols; i++){
-				buff +='--|';
-			}
-			buff += '\n';
-			
-			for(var j= 1; j <= rows; j++){
-				buff += '|';
-				for(var i=1; i <= cols; i++){
-					buff += '  |';
-				}
-				buff += '\n'
-			}
-		}
-		this.insertAfterSelection(buff);
-		caretInfo = {start:caretInfo.start+2, 
-								 end:caretInfo.end+2, 
-								 caret:caretInfo.caret+2};
+
+toolbar.addButton('TOC', function(){
+	
+	
+	this.insertAfterSelection('\n* toc\n{:toc}\n');
+	
+	if(confirm("Press ok to use automatically numbered headers.")) {
+		caretInfo = this.getCaretInfo($(textarea_id));
+		$(textarea_id).value = 'Use numbered headers: true\n\n' + $(textarea_id).value
+		// some hacks to put the carret just after the TOC adding.
+		var caretLeap = 'Use numbered headers: true\n\n'.length;
+		caretInfo = {start:caretInfo.start+caretLeap, 
+								 end:caretInfo.end+caretLeap, 
+								 caret:caretInfo.caret + caretLeap};
 		this.setCaretInfo($(textarea_id), caretInfo);
 	}
 },{
-	className: 'markdown_heading_button'
-});
-
-
-toolbar.addButton('Unordered List',function(event){
-	this.collectFromEachSelectedLine(function(line){
-		return event.shiftKey ? (line.match(/^\-{2,}/) ? line.replace(/^\-/,'') : line.replace(/^\-\s/,'')) : (line.match(/\-+\s/) ? '*' : '- ') + line;
-	});
-},{
-	className: 'markdown_unordered_list_button'
-});
-
-toolbar.addButton('Ordered List',function(event){
-	var i = 0;
-	this.collectFromEachSelectedLine(function(line){
-		if(!line.match(/^\s+$/)){
-			++i;
-			return event.shiftKey ? line.replace(/^\d+\.\s/,'') : (line.match(/\d+\.\s/) ? '' : i + '. ') + line;
-		}
-	});
-},{
-	className: 'markdown_ordered_list_button'
-});
-
-toolbar.addButton('Block Quote',function(event){
-	this.collectFromEachSelectedLine(function(line){
-		return event.shiftKey ? line.replace(/^\> /,'') : '> ' + line;
-	});
-},{
-	className: 'markdown_quote_button'
-});
-
-toolbar.addButton('Code Block',function(event){
-	this.collectFromEachSelectedLine(function(line){
-		return event.shiftKey ? line.replace(/    /,'') : '    ' + line;
-	});
-},{
-	className: 'markdown_code_block_button'
+	className: 'markdown_toc_button'
 });
 
 toolbar.addButton('Help',function(){

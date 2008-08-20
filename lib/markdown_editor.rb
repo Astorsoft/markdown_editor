@@ -1,4 +1,4 @@
-# MarkdownEditor
+# PickyColor
 module MarkdownEditor
   module FormHelper
 
