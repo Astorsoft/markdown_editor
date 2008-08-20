@@ -38,7 +38,9 @@ This plugin offer 3 way to use the helper :
           <%= f.markdown_editor :body %>
         <% end %>
 
-It is of course possible to add any html option in addition to these parameters as a Hash as last parameter of the methods.    
+It is of course possible to add any html option in addition to theseæ parameters as a Hash as last parameter of the methods. For example to override default class (which is "markdown_editor") and set it to "foo" :
+
+        <%= markdown_editor_tag "my_markdown_textarea",nil, :class => "foo" %>
     
       
 

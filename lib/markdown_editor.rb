@@ -1,4 +1,4 @@
-# PickyColor
+# MarkdownEditor
 module MarkdownEditor
   module FormHelper
 
@@ -7,7 +7,7 @@ module MarkdownEditor
     def markdown_editor_output(textarea, object_name, method, id)
       name = method.nil? ? "#{id}" : "#{object_name}_#{method}"
       
-      out << textarea
+      out = textarea
       
       out << (javascript_tag %{
         document.observe('dom:loaded',function(){
@@ -20,12 +20,13 @@ module MarkdownEditor
     
     def markdown_editor_tag(name, value = nil, options = {})
       options[:id] ||= name
+      options[:class] ||= "markdown_editor"
     
       
-      textarea = tag :textarea, { 
+      textarea = content_tag :textarea, nil, { 
                    "id" => options[:id], 
                    "name" => name,
-                   "class" => "markdown_editor",
+                   "class" => options[:class],
                    "value" => value}.update(options.stringify_keys)
 
       return markdown_editor_output(textarea, name, nil, options[:id])
@@ -34,6 +35,7 @@ module MarkdownEditor
             
     def markdown_editor(object, method, options = {})     
       obj = options[:object] || instance_variable_get("@#{object}")
+      options[:class] ||= "markdown_editor"
          
       textarea = ActionView::Helpers::InstanceTag.new(object, method, self, nil, options.delete(:object))
       return markdown_editor_output textarea.to_text_area_tag(options), object, method, nil 
