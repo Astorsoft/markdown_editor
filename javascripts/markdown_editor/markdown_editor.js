@@ -465,28 +465,32 @@ function tab_backward(){
 	textarea.setCaretInfo($(textarea_id), caretInfo_final);
 }
 
-function text_bold(){
-	textarea.smartWrap('**', '**')
-}
 
 function text_emphasize(){
-	textarea.smartWrap('_', '_')
+	textarea.smartWrap('_', '_'); return false;
 }
+
+function text_bold(){
+	textarea.smartWrap('**', '**'); return false;
+}
+
 
 // hotkeys
 
-new HotKey('b', text_bold, // ctrl + b
-{ element: $('textarea_id') });
-
 new HotKey('i',text_emphasize, // ctrl + i
+{ element: $('textarea_id'), ctrlKey: true });
+
+
+new HotKey('b', text_bold, // ctrl + b
+{ element: $('textarea_id'), ctrlKey: true });
+
+
+new HotKey('tab',tab_forward, // tab
 { element: $('textarea_id') });
 
-new HotKey('l',tab_forward, // alt + l
-{ element: $('textarea_id'), altKey: true, ctrlKey: false });
 
-
-new HotKey('k',tab_backward, // alt + k
-{ element: $('textarea_id'), altKey: true, ctrlKey: false });
+new HotKey('tab',tab_backward, // shift-tab
+{ element: $('textarea_id'), shiftKey: true });
 
 
 

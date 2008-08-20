@@ -7,6 +7,20 @@
  * @require prototype.js, livepipe.js
  */
 
+/*
+	letter		Preferred hotkey. Can be a letter or a key like 'left', 'return', 'backspace'. See prototype docs for all keys
+	callback	function( event )
+	options		simple object:
+				- element: element to observe for hotkey action
+				- shiftKey: true/false, whether modifier key is pressed
+				- altKey: idem
+				- ctrlKey: idem
+				- bubbleEvent: let events bubble down to their defaults, or stop after custom callback
+				- fireOnce: make the event only happen once, even if the key stays pressed, or let it fire as long as the key is pressed.
+*/
+
+
+
 if(typeof(Prototype) == "undefined")
 	throw "HotKey requires Prototype to be loaded.";
 if(typeof(Object.Event) == "undefined")
@@ -20,10 +34,24 @@ var HotKey = Class.create({
 			element: false,
 			shiftKey: false,
 			altKey: false,
-			ctrlKey: true
+			ctrlKey: false, // TJOEK: ctrlKey not turned on by default anymore
+			bubbleEvent: false,
+			fireOnce: true // TJOEK: Keep repeating event while the key is pressed?
 		},options || {});
 		this.letter = letter;
-		this.callback = callback;
+		this.fired = false;
+		this.callback = function( event ) // TJOEK: I want all custom hotkey events to stop after their custom actions
+		{
+			if( !(this.options.fireOnce && this.fired) )
+				callback( event );
+			this.fired = true;
+
+			if( !this.options.bubbleEvent )
+			{
+				event.stop(  );
+				if (event.preventDefault) event.preventDefault();
+			}
+		};
 		this.element = $(this.options.element || document);
 		this.handler = function(event){
 			if(!event || (
@@ -39,16 +67,30 @@ var HotKey = Class.create({
 				this.notify('afterCallback',event);
 			}
 		}.bind(this);
+		this.reset = function(  )
+		{
+			this.fired = false;
+		}.bind( this );
 		this.enable();
 	},
 	trigger: function(){
 		this.handler();
 	},
 	enable: function(){
-		this.element.observe('keydown',this.handler);
+		if( window.opera || Prototype.Browser.Gecko )
+			this.element.observe('keypress',this.handler);
+		else
+			this.element.observe('keydown',this.handler);
+
+		this.element.observe( 'keyup', this.reset );
 	},
 	disable: function(){
-		this.element.stopObserving('keydown',this.handler);
+		if( window.opera || Prototype.Browser.Gecko )
+			this.element.stopObserving('keypress',this.handler);
+		else
+			this.element.stopObserving('keydown',this.handler);
+
+		this.element.stopObserving( 'keyup', this.reset );
 	},
 	destroy: function(){
 		this.disable();
